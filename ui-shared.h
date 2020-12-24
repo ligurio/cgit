@@ -46,6 +46,9 @@ extern void cgit_refs_link(const char *name, const char *title,
 extern void cgit_snapshot_link(const char *name, const char *title,
 			       const char *class, const char *head,
 			       const char *rev, const char *archivename);
+extern void cgit_testres_link(const char *name, const char *title,
+			      const char *class, const char *head,
+			      const char *rev, const char *path);
 extern void cgit_diff_link(const char *name, const char *title,
 			   const char *class, const char *head,
 			   const char *new_rev, const char *old_rev,

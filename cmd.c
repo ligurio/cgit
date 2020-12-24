@@ -159,6 +159,12 @@ static void tag_fn(void)
 	cgit_print_tag(ctx.qry.oid);
 }
 
+static void testres_fn(void)
+{
+	cgit_print_testres(ctx.qry.oid);
+	//cgit_print_testres(ctx.qry.head, ctx.qry.oid);
+}
+
 static void tree_fn(void)
 {
 	cgit_print_tree(ctx.qry.oid, ctx.qry.path);
@@ -189,6 +195,7 @@ struct cgit_cmd *cgit_get_cmd(void)
 		def_cmd(snapshot, 1, 0, 0),
 		def_cmd(stats, 1, 1, 0),
 		def_cmd(summary, 1, 0, 0),
+		def_cmd(testres, 1, 0, 0),
 		def_cmd(tag, 1, 0, 0),
 		def_cmd(tree, 1, 1, 0),
 	};

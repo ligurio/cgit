@@ -457,6 +457,12 @@ void cgit_snapshot_link(const char *name, const char *title, const char *class,
 	reporevlink("snapshot", name, title, class, head, rev, archivename);
 }
 
+void cgit_testres_link(const char *name, const char *title, const char *class,
+		       const char *head, const char *rev, const char *path)
+{
+	reporevlink("testres", name, title, class, head, rev, path);
+}
+
 void cgit_diff_link(const char *name, const char *title, const char *class,
 		    const char *head, const char *new_rev, const char *old_rev,
 		    const char *path)

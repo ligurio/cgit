@@ -108,6 +108,7 @@ struct cgit_repo {
 	struct cgit_filter *about_filter;
 	struct cgit_filter *commit_filter;
 	struct cgit_filter *source_filter;
+	struct cgit_filter *testres_filter;
 	struct cgit_filter *email_filter;
 	struct cgit_filter *owner_filter;
 	struct string_list submodules;

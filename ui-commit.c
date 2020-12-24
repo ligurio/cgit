@@ -13,6 +13,77 @@
 #include "ui-diff.h"
 #include "ui-log.h"
 
+static struct notes_tree commit_testres_notes[5];
+
+const struct object_id *cgit_commit_get_testres(const char *ref)
+{
+	struct notes_tree *tree;
+	struct object_id oid;
+
+	if (get_oid(ref, &oid))
+		return NULL;
+
+	tree = &commit_testres_notes[0];
+	if (!tree->initialized) {
+		struct strbuf notes_ref = STRBUF_INIT;
+
+		strbuf_addf(&notes_ref, "refs/notes/commits");
+
+		init_notes(tree, notes_ref.buf, combine_notes_ignore, 0);
+		strbuf_release(&notes_ref);
+	}
+
+	return get_note(tree, &oid);
+}
+
+static int write_testres(const char *hex)
+{
+	const struct object_id *note = cgit_commit_get_testres(hex);
+	enum object_type type;
+	unsigned long size;
+	char *buf;
+
+	if (!note) {
+		cgit_print_error_page(404, "Not found",
+				"No test results for %s", hex);
+		return 0;
+	}
+
+	buf = read_object_file(note, &type, &size);
+	if (!buf) {
+		cgit_print_error_page(404, "Not found", "Not found");
+		return 0;
+	}
+
+	html("X-Content-Type-Options: nosniff\n");
+	html("Content-Security-Policy: default-src 'none'\n");
+	ctx.page.etag = oid_to_hex(note);
+	ctx.page.mimetype = xstrdup("plain/text");
+	ctx.page.filename = xstrdup(hex);
+	cgit_print_http_headers();
+
+	html_raw(buf, size);
+	free(buf);
+
+	return 0;
+}
+
+void cgit_print_testres(char *hex)
+{
+	struct object_id oid;
+
+	if (!hex)
+		hex = ctx.qry.head;
+
+	if (get_oid(hex, &oid)) {
+		cgit_print_error_page(400, "Bad request",
+				"Bad object id: %s", hex);
+		return;
+	}
+
+	write_testres(hex);
+}
+
 void cgit_print_commit(char *hex, const char *prefix)
 {
 	struct commit *commit, *parent;
@@ -113,6 +184,12 @@ void cgit_print_commit(char *hex, const char *prefix)
 		cgit_print_snapshot_links(ctx.repo, hex, "<br/>");
 		html("</td></tr>");
 	}
+
+	html("<tr><th>tests</th><td colspan='2' class='oid'>");
+	cgit_testres_link(tmp, NULL, NULL, NULL, tmp, prefix);
+	// write_testres(hex);
+	html("</td></tr>");
+
 	html("</table>\n");
 	html("<div class='commit-subject'>");
 	cgit_open_filter(ctx.repo->commit_filter);
