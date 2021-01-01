@@ -162,7 +162,6 @@ static void tag_fn(void)
 static void testres_fn(void)
 {
 	cgit_print_testres(ctx.qry.oid);
-	//cgit_print_testres(ctx.qry.head, ctx.qry.oid);
 }
 
 static void tree_fn(void)

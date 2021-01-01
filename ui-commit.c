@@ -1,6 +1,6 @@
 /* ui-commit.c: generate commit view
  *
- * Copyright (C) 2006-2014 cgit Development Team <cgit@lists.zx2c4.com>
+ * Copyright (C) 2006-2020 cgit Development Team <cgit@lists.zx2c4.com>
  *
  * Licensed under GNU General Public License v2
  *   (see COPYING for full license text)
@@ -81,7 +81,20 @@ void cgit_print_testres(char *hex)
 		return;
 	}
 
-	write_testres(hex);
+        if ((ctx.repo->testres_filter) || (ctx.cfg.testres_filter) || (1)) {
+	    struct strbuf notes = STRBUF_INIT;
+	    format_display_notes(&oid, &notes, PAGE_ENCODING, 0);
+            cgit_open_filter(ctx.repo->testres_filter);
+            cgit_print_layout_start();
+            if (notes.len != 0) {
+                    html_txt(notes.buf);
+            }
+            // TODO: cgit_commit_get_testres();
+            cgit_print_layout_end();
+            cgit_close_filter(ctx.repo->testres_filter);
+        } else {
+            write_testres(hex);
+        }
 }
 
 void cgit_print_commit(char *hex, const char *prefix)
@@ -155,8 +168,11 @@ void cgit_print_commit(char *hex, const char *prefix)
 		html(" /");
 		cgit_tree_link(prefix, NULL, NULL, ctx.qry.head, tmp, prefix);
 	}
-	free(tmp);
 	html("</td></tr>\n");
+	html("<tr><th>tests</th><td colspan='2' class='oid'>");
+	cgit_testres_link(tmp, NULL, NULL, NULL, tmp, prefix);
+	html("</td></tr>");
+	free(tmp);
 	for (p = commit->parents; p; p = p->next) {
 		parent = lookup_commit_reference(the_repository, &p->item->object.oid);
 		if (!parent) {
@@ -184,12 +200,6 @@ void cgit_print_commit(char *hex, const char *prefix)
 		cgit_print_snapshot_links(ctx.repo, hex, "<br/>");
 		html("</td></tr>");
 	}
-
-	html("<tr><th>tests</th><td colspan='2' class='oid'>");
-	cgit_testres_link(tmp, NULL, NULL, NULL, tmp, prefix);
-	// write_testres(hex);
-	html("</td></tr>");
-
 	html("</table>\n");
 	html("<div class='commit-subject'>");
 	cgit_open_filter(ctx.repo->commit_filter);

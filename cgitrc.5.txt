@@ -441,6 +441,13 @@ strict-export::
 	repositories to match those exported by git-daemon. This option must
 	be defined prior to scan-path.
 
+testres-filter::
+	Specifies a command which will be invoked to format testing results report.
+	The command will get the report's content on its STDIN, and the STDOUT from the
+	command will be included verbatim as the formatted report, i.e. this can
+	be used to parse report and visualize it. Default value: none.
+	See also: "FILTER API".
+
 virtual-root::
 	Url which, if specified, will be used as root for all cgit links. It
 	will also cause cgit to generate 'virtual urls', i.e. urls like
@@ -605,6 +612,10 @@ repo.source-filter::
 	Override the default source-filter. Default value: none. See also:
 	"enable-filter-overrides". See also: "FILTER API".
 
+repo.testres-filter::
+	Override the default testres-filter. Default value: none. See also:
+	"enable-filter-overrides". See also: "FILTER API".
+
 repo.url::
 	The relative url used to access the repository. This must be the first
 	setting specified for each repo. Default value: none.
@@ -723,6 +734,11 @@ source filter::
 	file that is to be filtered is available on standard input and the
 	filtered contents is expected on standard output.
 
+testres filter::
+        This filter is given a single parameter: the buffer with raw test
+        report contents to filter. The contents of the buffer that is to be
+        filtered is available on standard input and the filtered contents is
+        expected on standard output.
 
 All filters are handed the following environment variables:
 

@@ -460,7 +460,18 @@ void cgit_snapshot_link(const char *name, const char *title, const char *class,
 void cgit_testres_link(const char *name, const char *title, const char *class,
 		       const char *head, const char *rev, const char *path)
 {
-	reporevlink("testres", name, title, class, head, rev, path);
+	char *delim;
+
+	delim = repolink(title, class, "testres", head, path);
+	if (rev && ctx.qry.head != NULL && strcmp(rev, ctx.qry.head)) {
+		html(delim);
+		html("id=");
+		html_url_arg(rev);
+		delim = "&amp;";
+        }
+	html("'>");
+	html_txt(name);
+	html("</a>");
 }
 
 void cgit_diff_link(const char *name, const char *title, const char *class,
@@ -563,6 +574,10 @@ static void cgit_self_link(char *name, const char *title, const char *class)
 		cgit_snapshot_link(name, title, class, ctx.qry.head,
 				   ctx.qry.has_oid ? ctx.qry.oid : NULL,
 				   ctx.qry.path);
+	else if (!strcmp(ctx.qry.page, "testres"))
+		cgit_testres_link(name, title, class, ctx.qry.head,
+				  ctx.qry.has_oid ? ctx.qry.oid : NULL,
+				  ctx.qry.path);
 	else if (!strcmp(ctx.qry.page, "diff"))
 		cgit_diff_link(name, title, class, ctx.qry.head,
 			       ctx.qry.oid, ctx.qry.oid2,
